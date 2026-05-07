@@ -85,7 +85,13 @@ onMounted(fetchQuiz)
             <h1 class="text-4xl font-black text-slate-900 mb-2">{{ quiz.title }}</h1>
             <p class="text-slate-500 font-medium text-lg max-w-2xl">{{ quiz.description }}</p>
           </div>
-          <div class="text-right shrink-0">
+          <div class="text-right shrink-0 flex flex-col items-end">
+            <a v-if="quiz.document_path" :href="`http://127.0.0.1:8000/storage/${quiz.document_path}`" target="_blank" class="text-[10px] font-black text-blue-600 bg-blue-50 px-3 py-1.5 rounded-full flex items-center mb-4 hover:bg-blue-100 transition-colors border border-blue-100">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 mr-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+              </svg>
+              STUDY MATERIAL
+            </a>
             <p class="text-xs font-black text-slate-400 uppercase tracking-widest mb-1">Completion</p>
             <p class="text-3xl font-black text-blue-600">{{ progress }}%</p>
           </div>

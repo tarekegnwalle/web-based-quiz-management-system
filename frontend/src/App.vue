@@ -20,6 +20,7 @@ const handleLogout = async () => {
         <div class="flex items-center space-x-8 text-slate-600">
           <router-link to="/quizzes" class="font-medium hover:text-blue-600 transition-colors">Quizzes</router-link>
           <router-link v-if="auth.isAdmin.value" to="/admin/users" class="font-medium hover:text-blue-600 transition-colors">Users</router-link>
+          <router-link v-if="auth.isAdmin.value" to="/admin/courses" class="font-medium hover:text-blue-600 transition-colors">Courses</router-link>
           
           <div class="flex items-center space-x-4 border-l border-slate-200 pl-8">
             <div class="text-right">

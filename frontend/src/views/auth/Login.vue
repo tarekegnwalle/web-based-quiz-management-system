@@ -54,10 +54,6 @@ const handleLogin = async () => {
         </button>
       </form>
 
-      <div class="mt-10 text-center text-sm">
-        <span class="text-slate-500 font-medium">Don't have an account?</span>
-        <router-link to="/register" class="text-blue-600 hover:text-blue-700 font-bold ml-1">Create Account</router-link>
-      </div>
     </div>
   </div>
 </template>

@@ -32,6 +32,7 @@ class UserController extends Controller
             'email'    => 'required|string|email|max:255|unique:users',
             'password' => 'required|string|min:8',
             'role'     => 'required|in:admin,teacher,student',
+            'year'     => 'nullable|integer|min:1|max:4',
         ]);
 
         $user = User::create([
@@ -39,6 +40,7 @@ class UserController extends Controller
             'email'    => $request->email,
             'password' => Hash::make($request->password),
             'role'     => $request->role,
+            'year'     => $request->role === 'student' ? $request->year : null,
         ]);
 
         return response()->json($user, 201);
@@ -62,11 +64,16 @@ class UserController extends Controller
             'email'    => 'sometimes|required|email|unique:users,email,' . $user->id,
             'password' => 'sometimes|nullable|string|min:8',
             'role'     => 'sometimes|required|in:admin,teacher,student',
+            'year'     => 'nullable|integer|min:1|max:4',
         ]);
 
-        $data = $request->only('name', 'email', 'role');
+        $data = $request->only('name', 'email', 'role', 'year');
         if ($request->filled('password')) {
             $data['password'] = Hash::make($request->password);
+        }
+
+        if (isset($data['role']) && $data['role'] !== 'student') {
+            $data['year'] = null;
         }
 
         $user->update($data);
@@ -81,5 +88,42 @@ class UserController extends Controller
     {
         $user->delete();
         return response()->json(['message' => 'User deleted successfully']);
+    }
+
+    /**
+     * Import users from CSV (Admin only).
+     */
+    public function import(Request $request)
+    {
+        $request->validate([
+            'file' => 'required|file|mimes:csv,txt|max:2048',
+        ]);
+
+        $file = $request->file('file');
+        $handle = fopen($file->getRealPath(), 'r');
+        $header = fgetcsv($handle); // Read header
+
+        $count = 0;
+        while (($row = fgetcsv($handle)) !== false) {
+            $data = array_combine($header, $row);
+
+            // Basic validation/existence check
+            if (User::where('email', $data['email'])->exists()) {
+                continue;
+            }
+
+            User::create([
+                'name'     => $data['name'],
+                'email'    => $data['email'],
+                'password' => Hash::make($data['password']),
+                'role'     => $data['role'] ?? 'student',
+                'year'     => ($data['role'] ?? 'student') === 'student' ? ($data['year'] ?? 1) : null,
+                'status'   => 'pending',
+            ]);
+            $count++;
+        }
+        fclose($handle);
+
+        return response()->json(['message' => "Successfully imported $count users"]);
     }
 }

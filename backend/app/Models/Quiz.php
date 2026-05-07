@@ -9,7 +9,7 @@ class Quiz extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['title', 'description', 'file_path', 'creator_id'];
+    protected $fillable = ['title', 'description', 'year', 'document_path', 'creator_id'];
 
     public function creator()
     {

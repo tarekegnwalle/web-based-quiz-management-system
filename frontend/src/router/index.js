@@ -13,12 +13,6 @@ const routes = [
     meta: { guest: true }
   },
   {
-    path: '/register',
-    name: 'Register',
-    component: () => import('../views/auth/Register.vue'),
-    meta: { guest: true }
-  },
-  {
     path: '/dashboard',
     name: 'Dashboard',
     component: () => import('../views/Dashboard.vue'),
@@ -52,6 +46,12 @@ const routes = [
     path: '/admin/users',
     name: 'UserManagement',
     component: () => import('../views/admin/UserManagement.vue'),
+    meta: { auth: true, role: ['admin'] }
+  },
+  {
+    path: '/admin/courses',
+    name: 'CourseManagement',
+    component: () => import('../views/admin/CourseManagement.vue'),
     meta: { auth: true, role: ['admin'] }
   }
 ]

@@ -49,6 +49,12 @@ class AuthController extends Controller
             ]);
         }
 
+        if ($user->status !== 'active') {
+            throw ValidationException::withMessages([
+                'email' => ['Your account is pending activation by an administrator.'],
+            ]);
+        }
+
         $token = $user->createToken('auth_token')->plainTextToken;
 
         return response()->json([
