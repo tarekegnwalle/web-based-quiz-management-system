@@ -33,6 +33,7 @@ class UserController extends Controller
             'password' => 'required|string|min:8',
             'role'     => 'required|in:admin,teacher,student',
             'year'     => 'nullable|integer|min:1|max:4',
+            'status'   => 'nullable|string|in:active,pending',
         ]);
 
         $user = User::create([
@@ -41,6 +42,7 @@ class UserController extends Controller
             'password' => Hash::make($request->password),
             'role'     => $request->role,
             'year'     => $request->role === 'student' ? $request->year : null,
+            'status'   => $request->status ?? 'active',
         ]);
 
         return response()->json($user, 201);
@@ -65,9 +67,10 @@ class UserController extends Controller
             'password' => 'sometimes|nullable|string|min:8',
             'role'     => 'sometimes|required|in:admin,teacher,student',
             'year'     => 'nullable|integer|min:1|max:4',
+            'status'   => 'sometimes|required|string|in:active,pending',
         ]);
 
-        $data = $request->only('name', 'email', 'role', 'year');
+        $data = $request->only('name', 'email', 'role', 'year', 'status');
         if ($request->filled('password')) {
             $data['password'] = Hash::make($request->password);
         }
@@ -100,25 +103,31 @@ class UserController extends Controller
         ]);
 
         $file = $request->file('file');
+        ini_set('auto_detect_line_endings', true);
         $handle = fopen($file->getRealPath(), 'r');
         $header = fgetcsv($handle); // Read header
 
         $count = 0;
         while (($row = fgetcsv($handle)) !== false) {
+            if (count($header) !== count($row)) {
+                continue; // Skip rows that don't match the header count
+            }
             $data = array_combine($header, $row);
 
             // Basic validation/existence check
-            if (User::where('email', $data['email'])->exists()) {
+            if (empty($data['email']) || User::where('email', $data['email'])->exists()) {
                 continue;
             }
+
+            $password = !empty($data['password']) ? $data['password'] : 'Student@123';
 
             User::create([
                 'name'     => $data['name'],
                 'email'    => $data['email'],
-                'password' => Hash::make($data['password']),
+                'password' => Hash::make($password),
                 'role'     => $data['role'] ?? 'student',
                 'year'     => ($data['role'] ?? 'student') === 'student' ? ($data['year'] ?? 1) : null,
-                'status'   => 'pending',
+                'status'   => $data['status'] ?? 'pending',
             ]);
             $count++;
         }

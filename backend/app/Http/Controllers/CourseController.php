@@ -53,11 +53,15 @@ class CourseController extends Controller
         ]);
 
         $file = $request->file('file');
+        ini_set('auto_detect_line_endings', true);
         $handle = fopen($file->getRealPath(), 'r');
         $header = fgetcsv($handle);
 
         $count = 0;
         while (($row = fgetcsv($handle)) !== false) {
+            if (count($header) !== count($row)) {
+                continue;
+            }
             $data = array_combine($header, $row);
             Course::create([
                 'name' => $data['name'],

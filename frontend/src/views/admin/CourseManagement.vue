@@ -45,7 +45,7 @@ const saveCourse = async () => {
     fetchCourses()
     showModal.value = false
   } catch (err) {
-    alert('Failed to save course')
+    alert(err.response?.data?.message || 'Failed to save course')
   }
 }
 

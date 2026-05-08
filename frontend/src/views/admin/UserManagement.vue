@@ -48,7 +48,7 @@ const saveUser = async () => {
     fetchUsers()
     showModal.value = false
   } catch (err) {
-    alert('Failed to save user')
+    alert(err.response?.data?.message || 'Failed to save user. Check if email is unique and password is 8+ chars.')
   }
 }
 
